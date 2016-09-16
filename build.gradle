@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+
+    }
+}
+
+plugins {
+    id "io.spring.dependency-management" version "0.6.0.RELEASE"
+    id 'net.researchgate.release' version '2.4.1'
+    id "com.jfrog.bintray" version "1.7"
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: "spring-boot"
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Camden.RC1"
+
+    }
+}
+repositories {
+    mavenCentral()
+    maven { url "https://m2proxy.atlassian.com/repository/public" }
+    maven { url 'https://repo.spring.io/libs-milestone' }
+
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+description = 'EPAM Report portal. Jira Integration'
+
+dependencies {
+    /*compile 'com.epam.ta.reportportal:extension-bugtracking:2.5.2.1'*/
+
+    compile 'org.jasypt:jasypt:1.9.2'
+
+    compile('com.atlassian.jira:jira-rest-java-client-core:4.0.0')
+    compile('com.atlassian.fugue:fugue:2.6.1')
+
+    compile 'net.oauth.core:oauth:20090617'
+    compile 'net.oauth.core:oauth-httpclient4:20090617'
+
+    compile 'org.apache.tika:tika-core:1.13'
+}
+
+processResources {
+    filesMatching('**/bootstrap.yaml') {
+        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.property("version")])
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'reportportal'
+        name = "$project.name"
+        desc = "$description"
+        websiteUrl = 'https://reportportal.github.io/'
+        issueTrackerUrl = "https://github.com/eportportal/$project.name/issues"
+        vcsUrl = "https://github.com/reportportal/$project.name"
+        githubRepo = "reportportal/$project.name"
+        githubReleaseNotesFile = 'CHANGELOG.md'
+
+        userOrg = 'reportportal'
+        licenses = ['GPL-3.0']
+
+
+    }
+}
+//afterReleaseBuild.dependsOn bintrayUpload

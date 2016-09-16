@@ -1,0 +1,51 @@
+# Server Configuration
+server:
+  port: 8282
+
+# Eureka Configuration
+eureka:
+  instance:
+    hostname: ${reportportal.eureka.instance.hostname:localhost}
+    metadata-map:
+      extension: jira
+
+  client:
+    serviceUrl:
+      defaultZone: http://${reportportal.eureka.hostname:localhost}:8761/eureka/
+
+# MongoDB configuration
+rp:
+  mongo:
+    host: ${reportportal.mongo.host:docker.local}
+    port: 27017
+    dbName: reportportal
+#        user: user
+#        password: 1q2w3e
+    connectionsPerHost: 1000
+    threadsAllowedToBlockForConnectionMultiplier: 1000
+    connectTimeout: 20000
+    socketTimeout: 60000
+    maxWaitTime: 120000
+    autoConnectRetry: true
+    socketKeepAlive: true
+    slaveOk: true
+    writeTimeout: 0
+    writeNumber: 1
+    writeFsync: false
+  cache:
+      project:
+        size: 1000
+        expiration: 1
+        info: 10
+      ticket:
+        size: 10000
+        expiration: 5
+      user:
+        size: 1000
+        expiration: 60
+
+
+## OAUTH PRIVATE-PUBLIC keypair for JIRA integration
+oauth:
+  certificate:
+    store: oauth-keystore.jks

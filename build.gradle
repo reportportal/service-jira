@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE")
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.3'
 
     }
 }
@@ -20,6 +21,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: "spring-boot"
+apply from: 'build-docker.gradle'
 
 dependencyManagement {
     imports {
@@ -38,6 +40,10 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 description = 'EPAM Report portal. Jira Integration'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.0'
+}
 
 dependencies {
     /*compile 'com.epam.ta.reportportal:extension-bugtracking:2.5.2.1'*/

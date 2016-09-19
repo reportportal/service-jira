@@ -33,6 +33,8 @@ repositories {
     mavenCentral()
     maven { url "https://m2proxy.atlassian.com/repository/public" }
     maven { url 'https://repo.spring.io/libs-milestone' }
+    maven { url  "http://dl.bintray.com/epam/reportportal" }
+
 
 }
 
@@ -46,7 +48,7 @@ task wrapper(type: Wrapper) {
 }
 
 dependencies {
-    /*compile 'com.epam.ta.reportportal:extension-bugtracking:2.5.2.1'*/
+    compile 'com.epam.reportportal:commons-bugtracking:2.6.0'
 
     compile 'org.jasypt:jasypt:1.9.2'
 

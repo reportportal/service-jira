@@ -47,7 +47,7 @@ task wrapper(type: Wrapper) {
 }
 
 dependencies {
-    compile 'com.epam.reportportal:commons-bugtracking:2.6.1'
+    compile 'com.epam.reportportal:commons-bugtracking:2.6.2'
 
     compile 'org.jasypt:jasypt:1.9.2'
 

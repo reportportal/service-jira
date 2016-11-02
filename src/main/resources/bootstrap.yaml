@@ -3,6 +3,7 @@ info:
     name: Jira Service
     description: ReportPortal Jira Integration
     version: '@version@'
+    branch: '@branch@'
 
 spring:
   application:

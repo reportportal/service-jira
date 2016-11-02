@@ -22,6 +22,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: "spring-boot"
 apply from: 'build-docker.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
 
 dependencyManagement {
     imports {
@@ -63,12 +64,6 @@ dependencies {
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:2.0.2-beta'
-}
-
-processResources {
-    filesMatching('**/bootstrap.yaml') {
-        filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [version: project.property("version")])
-    }
 }
 
 bintray {

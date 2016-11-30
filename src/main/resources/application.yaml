@@ -16,7 +16,7 @@ eureka:
 # MongoDB configuration
 rp:
   mongo:
-    host: ${reportportal.mongo.host:docker.local}
+    host: evbyminsd6293.minsk.epam.com
     port: 27017
     dbName: reportportal
 #        user: user

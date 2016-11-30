@@ -18,22 +18,21 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: "spring-boot"
 apply from: 'build-docker.gradle'
+apply from: 'build-quality.gradle'
+apply from: 'release-service.gradle'
 apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Camden.RC1"
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Camden.RELEASE"
 
     }
 }
 repositories {
     mavenCentral()
     maven { url "https://m2proxy.atlassian.com/repository/public" }
-    maven { url 'https://repo.spring.io/libs-milestone' }
     maven { url  "http://dl.bintray.com/epam/reportportal" }
 
 
@@ -49,7 +48,7 @@ task wrapper(type: Wrapper) {
 }
 
 dependencies {
-    compile 'com.epam.reportportal:commons-bugtracking:2.6.0'
+    compile 'com.epam.reportportal:commons-bugtracking:2.6.2'
 
     compile 'org.jasypt:jasypt:1.9.2'
 
@@ -65,25 +64,3 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:2.0.2-beta'
 }
-
-bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-    publications = ['mavenJava']
-    pkg {
-        repo = 'reportportal'
-        name = "$project.name"
-        desc = "$description"
-        websiteUrl = 'https://reportportal.github.io/'
-        issueTrackerUrl = "https://github.com/eportportal/$project.name/issues"
-        vcsUrl = "https://github.com/reportportal/$project.name"
-        githubRepo = "reportportal/$project.name"
-        githubReleaseNotesFile = 'CHANGELOG.md'
-
-        userOrg = 'reportportal'
-        licenses = ['GPL-3.0']
-
-
-    }
-}
-//afterReleaseBuild.dependsOn bintrayUpload

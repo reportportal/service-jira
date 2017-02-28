@@ -1,6 +1,13 @@
+info:
+  build:
+    name: Jira Service
+    description: ReportPortal Jira Integration
+    version: '@version@'
+    branch: '@branch@'
+
 # Server Configuration
 server:
-  port: 8282
+  port: 8080
 
 # Eureka Configuration
 eureka:
@@ -16,7 +23,7 @@ eureka:
 # MongoDB configuration
 rp:
   mongo:
-    host: ${reportportal.mongo.host:docker.local}
+    host: ${reportportal.mongo.host:localhost}
     port: 27017
     dbName: reportportal
 #        user: user
@@ -49,3 +56,54 @@ rp:
 oauth:
   certificate:
     store: oauth-keystore.jks
+
+spring:
+  application:
+    name: jira
+  profiles:
+    ## Default one is still Eureka
+    active: ${rp.profiles:eureka}
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        tags:
+          - urlprefix-${server.contextPath}
+          - traefik.frontend.rule=PathPrefixStrip:/jira
+        healthCheckPath: ${server.contextPath}/health
+        host-info: ${server.contextPath}/info
+        ip-address: 10.200.10.1
+        prefer-ip-address: true
+eureka:
+  instance:
+    hostname: ${HOSTNAME:localhost}
+    status-page-url-path: ${server.contextPath}${management.contextPath}/info
+    health-check-url-path: ${server.contextPath}${management.contextPath}/health
+
+
+
+## Consul as service registry
+---
+spring:
+  profiles: eureka
+  cloud:
+    consul:
+      enabled: false
+      discovery:
+        register: false
+
+## Consul as service registry
+---
+spring:
+  profiles: consul
+  cloud:
+    consul:
+      enabled: true
+      discovery:
+        register: true
+eureka:
+  client:
+    register-with-eureka: false
+    enabled: false
+---

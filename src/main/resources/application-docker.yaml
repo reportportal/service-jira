@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    hostname: ${HOSTNAME:jira}
+  client:
+    serviceUrl:
+      defaultZone: http://registry:8761/eureka/
+
+rp:
+  mongo:
+    host: mongodb
+    port: 27017
+    dbName: reportportal
+    user:
+    password:
+
+spring:
+  redis:
+    host: redis
+    port: 6379
+  cloud:
+    consul:
+      host: consul
+      discovery:
+        hostname: jira
+        prefer-ip-address: false

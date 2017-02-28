@@ -1,0 +1,15 @@
+info:
+  build:
+    name: Jira Service
+    description: ReportPortal Jira Integration
+    version: '@version@'
+    branch: '@branch@'
+
+spring:
+  application:
+    name: jira
+
+security:
+  sessions: stateless
+  basic:
+    enabled: false

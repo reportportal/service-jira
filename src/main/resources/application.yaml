@@ -1,10 +1,3 @@
-info:
-  build:
-    name: Jira Service
-    description: ReportPortal Jira Integration
-    version: '@version@'
-    branch: '@branch@'
-
 # Server Configuration
 server:
   port: 8080
@@ -12,6 +5,8 @@ server:
 # Eureka Configuration
 eureka:
   instance:
+    status-page-url-path: ${server.contextPath}${management.contextPath}/info
+    health-check-url-path: ${server.contextPath}${management.contextPath}/health
     hostname: ${reportportal.eureka.instance.hostname:localhost}
     metadata-map:
       extension: jira
@@ -58,8 +53,6 @@ oauth:
     store: oauth-keystore.jks
 
 spring:
-  application:
-    name: jira
   profiles:
     ## Default one is still Eureka
     active: ${rp.profiles:eureka}
@@ -71,16 +64,12 @@ spring:
         tags:
           - urlprefix-${server.contextPath}
           - traefik.frontend.rule=PathPrefixStrip:/jira
+          - statusPageUrlPath=${server.contextPath:}/info
+          - healthCheckUrlPath=${server.contextPath:}/health
+          - extension:jira
         healthCheckPath: ${server.contextPath}/health
-        host-info: ${server.contextPath}/info
         ip-address: 10.200.10.1
         prefer-ip-address: true
-eureka:
-  instance:
-    hostname: ${HOSTNAME:localhost}
-    status-page-url-path: ${server.contextPath}${management.contextPath}/info
-    health-check-url-path: ${server.contextPath}${management.contextPath}/health
-
 
 
 ## Consul as service registry

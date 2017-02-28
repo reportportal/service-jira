@@ -5,8 +5,8 @@ server:
 # Eureka Configuration
 eureka:
   instance:
-    status-page-url-path: ${server.contextPath}${management.contextPath}/info
-    health-check-url-path: ${server.contextPath}${management.contextPath}/health
+    status-page-url-path: ${server.contextPath:}/info
+    health-check-url-path: ${server.contextPath:}/health
     hostname: ${reportportal.eureka.instance.hostname:localhost}
     metadata-map:
       extension: jira

@@ -24,5 +24,5 @@ spring:
     consul:
       host: consul
       discovery:
-        hostname: ${HOSTNAME:rally}
+        hostname: ${HOSTNAME:jira}
         prefer-ip-address: false

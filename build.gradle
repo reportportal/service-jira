@@ -5,7 +5,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.1.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
         classpath 'com.bmuschko:gradle-docker-plugin:3.0.5'
 
     }
@@ -28,7 +28,7 @@ apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/maste
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Camden.SR5"
-        mavenBom "org.springframework.boot:spring-boot-dependencies:1.5.1.RELEASE"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:1.5.2.RELEASE"
     }
 }
 repositories {
@@ -57,7 +57,7 @@ dependencies {
     if (releaseMode) {
         compile 'com.epam.reportportal:commons-bugtracking:2.6.2'
     } else {
-        compile('com.github.reportportal:commons-bugtracking:e9a9c653b0')
+        compile('com.github.reportportal:commons-bugtracking:1be58563b4')
     }
 
     compile 'org.jasypt:jasypt:1.9.2'

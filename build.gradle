@@ -57,7 +57,7 @@ dependencies {
     if (releaseMode) {
         compile 'com.epam.reportportal:commons-bugtracking:2.6.2'
     } else {
-        compile('com.github.reportportal:commons-bugtracking:1be58563b4')
+        compile('com.github.reportportal:commons-bugtracking:04ea0d9ed1')
     }
 
     compile 'org.jasypt:jasypt:1.9.2'

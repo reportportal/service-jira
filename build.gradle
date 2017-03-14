@@ -31,11 +31,19 @@ dependencyManagement {
         mavenBom "org.springframework.boot:spring-boot-dependencies:1.5.2.RELEASE"
     }
 }
+
+project.ext {
+    releaseMode = project.hasProperty("releaseMode")
+}
+
 repositories {
     mavenCentral()
     maven { url "https://m2proxy.atlassian.com/repository/public" }
-    maven { url  "http://dl.bintray.com/epam/reportportal" }
-    maven { url 'https://jitpack.io' }
+    maven { url "http://dl.bintray.com/epam/reportportal" }
+
+    if (!releaseMode) {
+        maven { url 'https://jitpack.io' }
+    }
 
 
 }
@@ -49,13 +57,9 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
 
-project.ext {
-    releaseMode = System.getProperty("releaseMode", "false") == "true"
-}
-
 dependencies {
     if (releaseMode) {
-        compile 'com.epam.reportportal:commons-bugtracking:2.6.2'
+        compile 'com.epam.reportportal:commons-bugtracking:3.0.0-BETA-2'
     } else {
         compile('com.github.reportportal:commons-bugtracking:04ea0d9ed1')
     }

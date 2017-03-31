@@ -53,24 +53,22 @@ oauth:
     store: oauth-keystore.jks
 
 spring:
-  profiles:
-    ## Default one is still Eureka
-    active: ${rp.profiles:eureka}
   cloud:
     consul:
       host: localhost
       port: 8500
       discovery:
         tags:
-          - urlprefix-${server.contextPath}
-          - traefik.frontend.rule=PathPrefixStrip:/jira
+          - urlprefix-${server.context-path:}/jira opts strip=/jira
+          - traefik.frontend.rule=PathPrefixStrip:${server.context-path:/}
           - statusPageUrlPath=${server.contextPath:}/info
           - healthCheckUrlPath=${server.contextPath:}/health
           - extension:jira
-        healthCheckPath: ${server.contextPath}/health
+        healthCheckPath: ${server.contextPath:}/health
         ip-address: 10.200.10.1
         prefer-ip-address: true
-
+        register: false
+      enabled: false
 
 ## Consul as service registry
 ---

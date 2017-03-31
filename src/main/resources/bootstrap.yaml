@@ -4,6 +4,7 @@ info:
     description: ReportPortal Jira Integration
     version: '@version@'
     branch: '@branch@'
+    repo: '@repo@'
 
 spring:
   application:

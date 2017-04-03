@@ -10,8 +10,7 @@ spring:
   application:
     name: jira
   profiles:
-    # Default one is still Eureka
-    active: ${rp.profiles:eureka}
+    active: ${rp.profiles:default}
 security:
   sessions: stateless
   basic:

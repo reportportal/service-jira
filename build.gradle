@@ -59,9 +59,9 @@ task wrapper(type: Wrapper) {
 
 dependencies {
     if (releaseMode) {
-        compile 'com.epam.reportportal:commons-bugtracking:3.0.0-BETA-2'
+        compile 'com.epam.reportportal:commons-bugtracking:3.0.0-BETA-3'
     } else {
-        compile('com.github.reportportal:commons-bugtracking:04ea0d9ed1')
+        compile('com.github.reportportal:commons-bugtracking:3.0.0-BETA-3')
     }
 
     compile 'org.jasypt:jasypt:1.9.2'

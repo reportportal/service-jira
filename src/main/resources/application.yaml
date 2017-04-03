@@ -68,6 +68,10 @@ spring:
         healthCheckPath: ${server.contextPath:}/health
         register: false
       enabled: false
+logging:
+  level:
+    com.netflix.discovery.shared.resolver : warn
+
 
 ## Consul as service registry
 ---

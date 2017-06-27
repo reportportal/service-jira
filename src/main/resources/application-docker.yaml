@@ -22,7 +22,7 @@ spring:
     port: 6379
   cloud:
     consul:
-      host: consul
+      host: registry
       discovery:
         hostname: ${HOSTNAME:jira}
         prefer-ip-address: false

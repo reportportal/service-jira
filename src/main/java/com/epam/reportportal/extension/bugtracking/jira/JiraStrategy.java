@@ -173,21 +173,18 @@ public class JiraStrategy implements ExternalSystemStrategy {
             if (null != components.getValue()) {
                 Set<String> validComponents = StreamSupport.stream(jiraProject.getComponents().spliterator(), false)
                         .map(JiraPredicates.COMPONENT_NAMES).collect(toSet());
-                validComponents.forEach(component -> expect(component, in(validComponents))
-                        .verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
-                                formattedSupplier("Component '{}' not exists in the external system", component)));
+                validComponents.forEach(component -> expect(component, in(validComponents)).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
+                        formattedSupplier("Component '{}' not exists in the external system", component)));
             }
 
             // TODO consider to modify code below - project cached
             Optional<IssueType> issueType = StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
                     .filter(input -> issueTypeStr.equalsIgnoreCase(input.getName())).findFirst();
 
-            expect(issueType, Preconditions.IS_PRESENT).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, formattedSupplier(
-                    "Unable post issue with type '{}' for project '{}'.", issuetype.getValue().get(0),
-                    details.getProject()));
+            expect(issueType, Preconditions.IS_PRESENT).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
+                    formattedSupplier("Unable post issue with type '{}' for project '{}'.", issuetype.getValue().get(0), details.getProject()));
             IssueInput issueInput = JIRATicketUtils
-                    .toIssueInput(client, jiraProject, issueType, ticketRQ, ticketRQ.getBackLinks().keySet(),
-                            descriptionService);
+                    .toIssueInput(client, jiraProject, issueType, ticketRQ, ticketRQ.getBackLinks().keySet(), descriptionService);
 
             Map<String, String> binaryData = findBinaryData(issueInput);
 
@@ -209,10 +206,11 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 }
             }
             if (counter != 0)
-                client.getIssueClient()
-                        .addAttachments(issue.getAttachmentsUri(), Arrays.copyOf(attachmentInputs, counter));
+                client.getIssueClient().addAttachments(issue.getAttachmentsUri(), Arrays.copyOf(attachmentInputs, counter));
             return getTicket(createdIssue.getKey(), details, client).orElse(null);
 
+        } catch (ReportPortalException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, e.getMessage());

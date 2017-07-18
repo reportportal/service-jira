@@ -24,28 +24,14 @@ package com.epam.reportportal.extension.bugtracking.jira;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptions;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptionsBuilder;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.domain.BasicComponent;
-import com.atlassian.jira.rest.client.api.domain.BasicIssue;
-import com.atlassian.jira.rest.client.api.domain.BasicPriority;
-import com.atlassian.jira.rest.client.api.domain.BasicProjectRole;
-import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
-import com.atlassian.jira.rest.client.api.domain.CimIssueType;
-import com.atlassian.jira.rest.client.api.domain.CimProject;
-import com.atlassian.jira.rest.client.api.domain.EntityHelper;
-import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.IssueFieldId;
-import com.atlassian.jira.rest.client.api.domain.IssueType;
-import com.atlassian.jira.rest.client.api.domain.Project;
-import com.atlassian.jira.rest.client.api.domain.ProjectRole;
-import com.atlassian.jira.rest.client.api.domain.RoleActor;
-import com.atlassian.jira.rest.client.api.domain.SearchResult;
-import com.atlassian.jira.rest.client.api.domain.Version;
+import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.epam.reportportal.extension.bugtracking.ExternalSystemStrategy;
 import com.epam.ta.reportportal.commons.Preconditions;
+import com.epam.ta.reportportal.commons.validation.BusinessRule;
 import com.epam.ta.reportportal.config.CacheConfiguration;
 import com.epam.ta.reportportal.database.BinaryData;
 import com.epam.ta.reportportal.database.DataStorage;
@@ -65,23 +51,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
-import static com.epam.ta.reportportal.commons.Predicates.equalTo;
-import static com.epam.ta.reportportal.commons.Predicates.in;
-import static com.epam.ta.reportportal.commons.Predicates.isNull;
-import static com.epam.ta.reportportal.commons.Predicates.not;
-import static com.epam.ta.reportportal.commons.Predicates.notNull;
+import static com.epam.ta.reportportal.commons.Predicates.*;
 import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
 import static com.epam.ta.reportportal.commons.validation.Suppliers.formattedSupplier;
 import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM;
@@ -267,6 +242,10 @@ public class JiraStrategy implements ExternalSystemStrategy {
             Project jiraProject = getProject(client, details);
             Optional<IssueType> issueType = StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
                     .filter(input -> ticketType.equalsIgnoreCase(input.getName())).findFirst();
+
+			BusinessRule.expect(issueType, Preconditions.IS_PRESENT)
+					.verify(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, "Ticket type '" + ticketType + "' not found");
+
             GetCreateIssueMetadataOptions options = new GetCreateIssueMetadataOptionsBuilder()
                     .withExpandedIssueTypesFields()
                     .withProjectKeys(jiraProject.getKey()).build();

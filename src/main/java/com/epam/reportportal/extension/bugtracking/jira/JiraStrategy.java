@@ -319,6 +319,19 @@ public class JiraStrategy implements ExternalSystemStrategy {
 
     }
 
+    @Override
+    public List<String> getIssueTypes(ExternalSystem system) {
+        try (JiraRestClient client = getClient(system.getUrl(), system.getUsername(),
+                simpleEncryptor.decrypt(system.getPassword()))) {
+            Project jiraProject = getProject(client, system);
+            return StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
+                    .map(IssueType::getName).collect(Collectors.toList());
+        }catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return Collections.emptyList();
+        }
+    }
+
     /**
      * JIRA properties validator
      *

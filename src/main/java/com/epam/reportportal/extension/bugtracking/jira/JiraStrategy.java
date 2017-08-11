@@ -289,9 +289,6 @@ public class JiraStrategy implements ExternalSystemStrategy {
                     }
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ISSUE_TYPE_FIELD.id)) {
-                    for (IssueType type : jiraProject.getIssueTypes()) {
-                        allowed.add(new AllowedValue(String.valueOf(type.getId()), type.getName()));
-                    }
                     defValue = Collections.singletonList(ticketType);
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ASSIGNEE_FIELD.id)) {

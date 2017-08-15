@@ -17,51 +17,42 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with Report Portal.  If not, see <http://www.gnu.org/licenses/>.
- */ 
+ */
 
 package com.epam.reportportal.extension.bugtracking.jira;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.epam.ta.reportportal.commons.validation.Suppliers;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptions;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptionsBuilder;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
-import com.atlassian.jira.rest.client.api.domain.CimIssueType;
-import com.atlassian.jira.rest.client.api.domain.CimProject;
-import com.atlassian.jira.rest.client.api.domain.CustomFieldOption;
-import com.atlassian.jira.rest.client.api.domain.EntityHelper;
-import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.IssueFieldId;
-import com.atlassian.jira.rest.client.api.domain.IssueType;
-import com.atlassian.jira.rest.client.api.domain.Project;
-import com.atlassian.jira.rest.client.api.domain.User;
+import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
 import com.epam.ta.reportportal.commons.Predicates;
 import com.epam.ta.reportportal.commons.validation.BusinessRule;
+import com.epam.ta.reportportal.commons.validation.Suppliers;
 import com.epam.ta.reportportal.database.entity.ExternalSystem;
 import com.epam.ta.reportportal.ws.model.ErrorType;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 import com.google.common.collect.Lists;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Provide tools for working with JIRA tickets(conversion).
- * 
+ *
  * @author Aliaksei_Makayed
  * @author Andrei_Ramanchuk
  */
@@ -91,8 +82,10 @@ public class JIRATicketUtils {
 		IssueInputBuilder issueInputBuilder = new IssueInputBuilder(jiraProject, issueType.get());
 		GetCreateIssueMetadataOptions options = new GetCreateIssueMetadataOptionsBuilder().withExpandedIssueTypesFields()
 				.withProjectKeys(jiraProject.getKey()).build();
-		Iterable<CimProject> projects = client.getIssueClient().getCreateIssueMetadata(options).claim();
-		CimProject project = projects.iterator().next();
+		Iterator<CimProject> projects = client.getIssueClient().getCreateIssueMetadata(options).claim().iterator();
+		BusinessRule.expect(projects.hasNext(), Predicates.equalTo(true))
+				.verify(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, String.format("Project %s not found", jiraProject.getKey()));
+		CimProject project = projects.next();
 		CimIssueType cimIssueType = EntityHelper.findEntityById(project.getIssueTypes(), issueType.get().getId());
 		List<PostFormField> fields = ticketRQ.getFields();
 		for (PostFormField one : fields) {
@@ -107,8 +100,8 @@ public class JIRATicketUtils {
 
 			// Skip issuetype and project fields cause got them in
 			// issueInputBuilder already
-			if (one.getId().equalsIgnoreCase(IssueFieldId.ISSUE_TYPE_FIELD.id)
-					|| one.getId().equalsIgnoreCase(IssueFieldId.PROJECT_FIELD.id))
+			if (one.getId().equalsIgnoreCase(IssueFieldId.ISSUE_TYPE_FIELD.id) || one.getId()
+					.equalsIgnoreCase(IssueFieldId.PROJECT_FIELD.id))
 				continue;
 
 			if (one.getId().equalsIgnoreCase(IssueFieldId.DESCRIPTION_FIELD.id))
@@ -199,7 +192,7 @@ public class JIRATicketUtils {
 
 	/**
 	 * Processing labels for JIRA through spaces split
-	 * 
+	 *
 	 * @param values
 	 * @return
 	 */
@@ -209,7 +202,7 @@ public class JIRATicketUtils {
 
 	/**
 	 * Just JIRA field types enumerator
-	 * 
+	 *
 	 * @author Andrei_Ramanchuk
 	 */
 	public enum IssueFieldType {

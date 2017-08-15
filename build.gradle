@@ -54,10 +54,6 @@ targetCompatibility = 1.8
 
 description = 'EPAM Report portal. Jira Integration'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
-}
-
 dependencies {
     if (releaseMode) {
         compile 'com.epam.reportportal:commons-bugtracking:3.1.0'
@@ -89,3 +85,7 @@ test {
 }
 
 build.dependsOn jacocoTestReport
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+}

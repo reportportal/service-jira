@@ -375,6 +375,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 }
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
+                throw new ReportPortalException("There is a problem while getting issue types", e);
             }
         }
         return result;

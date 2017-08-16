@@ -54,6 +54,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.epam.ta.reportportal.commons.Predicates.*;
@@ -288,7 +289,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
                     }
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ISSUE_TYPE_FIELD.id)) {
-                    defValue = Lists.newArrayList(BUG);
+                    defValue = Collections.singletonList(ticketType);
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ASSIGNEE_FIELD.id)) {
                     allowed = getJiraProjectAssignee(jiraProject);
@@ -315,6 +316,19 @@ public class JiraStrategy implements ExternalSystemStrategy {
             return new ArrayList<>();
         }
 
+    }
+
+    @Override
+    public List<String> getIssueTypes(ExternalSystem system) {
+        try (JiraRestClient client = getClient(system.getUrl(), system.getUsername(),
+                simpleEncryptor.decrypt(system.getPassword()))) {
+            Project jiraProject = getProject(client, system);
+            return StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
+                    .map(IssueType::getName).collect(Collectors.toList());
+        }catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -361,6 +375,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 }
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
+                throw new ReportPortalException("There is a problem while getting issue types", e);
             }
         }
         return result;

@@ -24,7 +24,21 @@ package com.epam.reportportal.extension.bugtracking.jira;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptions;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptionsBuilder;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.domain.*;
+import com.atlassian.jira.rest.client.api.domain.BasicComponent;
+import com.atlassian.jira.rest.client.api.domain.BasicIssue;
+import com.atlassian.jira.rest.client.api.domain.BasicPriority;
+import com.atlassian.jira.rest.client.api.domain.BasicProjectRole;
+import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
+import com.atlassian.jira.rest.client.api.domain.CimIssueType;
+import com.atlassian.jira.rest.client.api.domain.CimProject;
+import com.atlassian.jira.rest.client.api.domain.EntityHelper;
+import com.atlassian.jira.rest.client.api.domain.Issue;
+import com.atlassian.jira.rest.client.api.domain.IssueFieldId;
+import com.atlassian.jira.rest.client.api.domain.IssueType;
+import com.atlassian.jira.rest.client.api.domain.Project;
+import com.atlassian.jira.rest.client.api.domain.ProjectRole;
+import com.atlassian.jira.rest.client.api.domain.SearchResult;
+import com.atlassian.jira.rest.client.api.domain.Version;
 import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
@@ -51,13 +65,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.epam.ta.reportportal.commons.Predicates.*;
+import static com.epam.ta.reportportal.commons.Predicates.equalTo;
+import static com.epam.ta.reportportal.commons.Predicates.in;
+import static com.epam.ta.reportportal.commons.Predicates.isNull;
+import static com.epam.ta.reportportal.commons.Predicates.not;
+import static com.epam.ta.reportportal.commons.Predicates.notNull;
 import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
 import static com.epam.ta.reportportal.commons.validation.Suppliers.formattedSupplier;
 import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM;
@@ -149,8 +175,9 @@ public class JiraStrategy implements ExternalSystemStrategy {
             if (null != components.getValue()) {
                 Set<String> validComponents = StreamSupport.stream(jiraProject.getComponents().spliterator(), false)
                         .map(JiraPredicates.COMPONENT_NAMES).collect(toSet());
-                validComponents.forEach(component -> expect(component, in(validComponents)).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
-                        formattedSupplier("Component '{}' not exists in the external system", component)));
+                validComponents.forEach(component -> expect(component, in(validComponents))
+                        .verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
+                                formattedSupplier("Component '{}' not exists in the external system", component)));
             }
 
             // TODO consider to modify code below - project cached
@@ -158,9 +185,11 @@ public class JiraStrategy implements ExternalSystemStrategy {
                     .filter(input -> issueTypeStr.equalsIgnoreCase(input.getName())).findFirst();
 
             expect(issueType, Preconditions.IS_PRESENT).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
-                    formattedSupplier("Unable post issue with type '{}' for project '{}'.", issuetype.getValue().get(0), details.getProject()));
+                    formattedSupplier("Unable post issue with type '{}' for project '{}'.", issuetype.getValue().get(0),
+                            details.getProject()));
             IssueInput issueInput = JIRATicketUtils
-                    .toIssueInput(client, jiraProject, issueType, ticketRQ, ticketRQ.getBackLinks().keySet(), descriptionService);
+                    .toIssueInput(client, jiraProject, issueType, ticketRQ, ticketRQ.getBackLinks().keySet(),
+                            descriptionService);
 
             Map<String, String> binaryData = findBinaryData(issueInput);
 
@@ -182,7 +211,8 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 }
             }
             if (counter != 0)
-                client.getIssueClient().addAttachments(issue.getAttachmentsUri(), Arrays.copyOf(attachmentInputs, counter));
+                client.getIssueClient()
+                        .addAttachments(issue.getAttachmentsUri(), Arrays.copyOf(attachmentInputs, counter));
             return getTicket(createdIssue.getKey(), details, client).orElse(null);
 
         } catch (ReportPortalException e) {
@@ -244,8 +274,9 @@ public class JiraStrategy implements ExternalSystemStrategy {
             Optional<IssueType> issueType = StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
                     .filter(input -> ticketType.equalsIgnoreCase(input.getName())).findFirst();
 
-			BusinessRule.expect(issueType, Preconditions.IS_PRESENT)
-					.verify(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, "Ticket type '" + ticketType + "' not found");
+            BusinessRule.expect(issueType, Preconditions.IS_PRESENT)
+                    .verify(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
+                            "Ticket type '" + ticketType + "' not found");
 
             GetCreateIssueMetadataOptions options = new GetCreateIssueMetadataOptionsBuilder()
                     .withExpandedIssueTypesFields()
@@ -292,7 +323,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
                     defValue = Collections.singletonList(ticketType);
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ASSIGNEE_FIELD.id)) {
-                    allowed = getJiraProjectAssignee(client, jiraProject);
+                    allowed = getJiraProjectAssignee(jiraProject);
                 }
 
                 //@formatter:off
@@ -325,7 +356,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
             Project jiraProject = getProject(client, system);
             return StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
                     .map(IssueType::getName).collect(Collectors.toList());
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             return Collections.emptyList();
         }
@@ -358,27 +389,21 @@ public class JiraStrategy implements ExternalSystemStrategy {
      * @param jiraProject Project from JIRA
      * @return List of allowed values
      */
-    private List<AllowedValue> getJiraProjectAssignee(JiraRestClient client, Project jiraProject) {
-        List<AllowedValue> result = Lists.newArrayList();
+    private List<AllowedValue> getJiraProjectAssignee(Project jiraProject) {
         Iterable<BasicProjectRole> jiraProjectRoles = jiraProject.getProjectRoles();
-        Iterator<BasicProjectRole> itr = jiraProjectRoles.iterator();
-        List<String> temp = Lists.newArrayList();
-        while (itr.hasNext()) {
-            try {
-                ProjectRole role = client.getProjectRolesRestClient().getRole(itr.next().getSelf()).claim();
-                Iterable<RoleActor> actors = role.getActors();
-                for (RoleActor actor : actors) {
-                    if (!temp.contains(actor.getName())) {
-                        temp.add(actor.getName());
-                        result.add(new AllowedValue(String.valueOf(actor.getId()), actor.getDisplayName()));
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                throw new ReportPortalException("There is a problem while getting issue types", e);
-            }
+        try {
+            return StreamSupport.stream(jiraProjectRoles.spliterator(), false)
+                    .filter(role -> role instanceof ProjectRole)
+                    .map(role -> (ProjectRole) role)
+                    .flatMap(role -> StreamSupport.stream(role.getActors().spliterator(), false))
+                    .distinct()
+                    .map(actor -> new AllowedValue(String.valueOf(actor.getId()), actor.getDisplayName()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new ReportPortalException("There is a problem while getting issue types", e);
         }
-        return result;
+
     }
 
     public JiraRestClient getClient(String uri, String providedUsername, String providePassword) {

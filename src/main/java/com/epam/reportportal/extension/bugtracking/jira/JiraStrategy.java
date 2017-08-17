@@ -292,7 +292,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
                     defValue = Collections.singletonList(ticketType);
                 }
                 if (fieldID.equalsIgnoreCase(IssueFieldId.ASSIGNEE_FIELD.id)) {
-                    allowed = getJiraProjectAssignee(jiraProject);
+                    allowed = getJiraProjectAssignee(client, jiraProject);
                 }
 
                 //@formatter:off
@@ -358,14 +358,14 @@ public class JiraStrategy implements ExternalSystemStrategy {
      * @param jiraProject Project from JIRA
      * @return List of allowed values
      */
-    private List<AllowedValue> getJiraProjectAssignee(Project jiraProject) {
+    private List<AllowedValue> getJiraProjectAssignee(JiraRestClient client, Project jiraProject) {
         List<AllowedValue> result = Lists.newArrayList();
         Iterable<BasicProjectRole> jiraProjectRoles = jiraProject.getProjectRoles();
         Iterator<BasicProjectRole> itr = jiraProjectRoles.iterator();
         List<String> temp = Lists.newArrayList();
         while (itr.hasNext()) {
             try {
-                ProjectRole role = (ProjectRole) itr.next();
+                ProjectRole role = client.getProjectRolesRestClient().getRole(itr.next().getSelf()).claim();
                 Iterable<RoleActor> actors = role.getActors();
                 for (RoleActor actor : actors) {
                     if (!temp.contains(actor.getName())) {

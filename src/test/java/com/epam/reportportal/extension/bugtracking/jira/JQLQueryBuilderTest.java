@@ -55,7 +55,7 @@ public class JQLQueryBuilderTest {
 	public void testBuildFullQuery() {
 		JQLQueryBuilder builder = JQLQueryBuilder.getInstance();
 		String query = builder.and(JQLQueryBuilder.Condition.BEGIN_WITH_SUMMARY, "test_summary").and(JQLQueryBuilder.Condition.EQUALS_PROJECT, "TEST_PROJECT")
-				.and(JQLQueryBuilder.Condition.EQUALS_TYPE, JIRATicketType.STORY.getValue()).build();
+				.and(JQLQueryBuilder.Condition.EQUALS_TYPE, "story").build();
 		Assert.assertNotNull(query);
 		Assert.assertEquals("summary~\"test_summary\" AND project = TEST_PROJECT AND type = story", query);
 	}

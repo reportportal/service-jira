@@ -57,7 +57,6 @@ import com.epam.ta.reportportal.ws.model.externalsystem.AllowedValue;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
-import com.google.common.collect.Lists;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -166,8 +164,6 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 formattedSupplier("[IssueType] field has multiple values '{}' but should be only one",
                         issuetype.getValue()));
         final String issueTypeStr = issuetype.getValue().get(0);
-        expect(JIRATicketType.findByName(issueTypeStr), not(isNull())).verify(UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
-                formattedSupplier("Ticket with [IssueType] '{}' cannot be send to external system", issueTypeStr));
 
         try (JiraRestClient client = getClient(details.getUrl(), ticketRQ.getUsername(), ticketRQ.getPassword())) {
             Project jiraProject = getProject(client, details);

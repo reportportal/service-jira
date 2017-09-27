@@ -121,7 +121,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
     }
 
     @Override
-    @Cacheable(value = CacheConfiguration.EXTERNAL_SYSTEM_TICKET_CACHE, key = CacheConfiguration.EXTERNAL_SYSTEM_TICKET_CACHE_KEY)
+    @Cacheable(value = CacheConfiguration.EXTERNAL_SYSTEM_TICKET_CACHE, key = "#system.url + #system.project + #id")
     public Optional<Ticket> getTicket(final String id, ExternalSystem system) {
         try (JiraRestClient client = getClient(system.getUrl(), system.getUsername(),
                 simpleEncryptor.decrypt(system.getPassword()))) {

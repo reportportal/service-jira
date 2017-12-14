@@ -29,7 +29,7 @@ apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/maste
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Edgware.RELEASE"
-        mavenBom "org.springframework.boot:spring-boot-dependencies:1.5.6.RELEASE"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:1.5.9.RELEASE"
     }
 }
 
@@ -58,7 +58,7 @@ dependencies {
     if (releaseMode) {
         compile 'com.epam.reportportal:commons-bugtracking:3.3.1'
     } else {
-        compile('com.github.reportportal:commons-bugtracking:3.3.1')
+        compile('com.github.reportportal:commons-bugtracking:87ef1e5')
     }
 
     compile 'org.jasypt:jasypt:1.9.2'

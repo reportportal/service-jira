@@ -65,7 +65,7 @@ spring:
           - statusPageUrlPath=${server.contextPath:}/info
           - healthCheckUrlPath=${server.contextPath:}/health
           - extension=jira
-        healthCheckPath: ${server.contextPath}/admin/health
+        healthCheckPath: ${server.contextPath:}/health
         register: true
         instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
         health-check-critical-timeout: 30s

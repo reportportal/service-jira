@@ -10,11 +10,7 @@ eureka:
 
 rp:
   mongo:
-    host: mongodb
-    port: 27017
-    dbName: reportportal
-    user:
-    password:
+    uri: mongodb://mongodb:27017
 
 spring:
   redis:

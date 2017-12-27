@@ -19,11 +19,8 @@ eureka:
 # MongoDB configuration
 rp:
   mongo:
-    host: ${reportportal.mongo.host:localhost}
-    port: 27017
+    uri: mongodb://localhost:27017
     dbName: reportportal
-#        user: user
-#        password: 1q2w3e
     connectionsPerHost: 1000
     threadsAllowedToBlockForConnectionMultiplier: 1000
     connectTimeout: 20000

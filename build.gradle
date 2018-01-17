@@ -56,9 +56,9 @@ description = 'EPAM Report portal. Jira Integration'
 
 dependencies {
     if (releaseMode) {
-        compile 'com.epam.reportportal:commons-bugtracking:4.0.1'
+        compile 'com.epam.reportportal:commons-bugtracking:4.0.2'
     } else {
-        compile('com.github.reportportal:commons-bugtracking:4.0.1')
+        compile('com.github.reportportal:commons-bugtracking:4.0.2')
     }
 
     compile 'org.jasypt:jasypt:1.9.2'

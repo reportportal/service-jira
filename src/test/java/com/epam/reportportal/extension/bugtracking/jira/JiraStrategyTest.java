@@ -25,7 +25,6 @@ import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.util.concurrent.Promise;
 import com.epam.ta.reportportal.database.entity.AuthType;
 import com.epam.ta.reportportal.database.entity.ExternalSystem;
-import com.epam.ta.reportportal.database.entity.item.issue.ExternalSystemType;
 import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
@@ -86,7 +85,7 @@ public class JiraStrategyTest {
 	public void getTicketTest() {
 		final ExternalSystem system = new ExternalSystem();
 		system.setUrl("https://jira.epam.com");
-		system.setExternalSystemType(ExternalSystemType.JIRA);
+		system.setExternalSystemType("JIRA");
 		final Optional<Ticket> ticketId = jiraStrategy.getTicket("ticketId", system);
 		Assert.assertTrue(ticketId.isPresent());
 		Assert.assertEquals("ticketId", ticketId.get().getId());

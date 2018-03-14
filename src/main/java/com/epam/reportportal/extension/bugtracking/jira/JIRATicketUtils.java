@@ -37,6 +37,7 @@ import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class JIRATicketUtils {
 		ticket.setId(input.getKey());
 		ticket.setSummary(input.getSummary());
 		ticket.setStatus(input.getStatus().getName());
-		ticket.setTicketUrl(details.getExternalSystemType().makeUrl(details.getUrl(), input.getKey()));
+		ticket.setTicketUrl(StringUtils.stripEnd(details.getUrl(), "/") + "/browse/" + input.getKey());
 		return ticket;
 	}
 

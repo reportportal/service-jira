@@ -353,8 +353,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
             return StreamSupport.stream(jiraProject.getIssueTypes().spliterator(), false)
                     .map(IssueType::getName).collect(Collectors.toList());
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return Collections.emptyList();
+        	throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM, "Check connection settings.");
         }
     }
 

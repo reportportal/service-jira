@@ -39,8 +39,8 @@ project.ext {
 
 repositories {
     mavenCentral()
-    maven { url "https://m2proxy.atlassian.com/repository/public" }
     maven { url "http://dl.bintray.com/epam/reportportal" }
+    maven { url "https://m2proxy.atlassian.com/repository/public" }
 
     if (!releaseMode) {
         maven { url 'https://jitpack.io' }

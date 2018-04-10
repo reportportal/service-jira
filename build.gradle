@@ -39,8 +39,8 @@ project.ext {
 
 repositories {
     mavenCentral()
-    maven { url "https://m2proxy.atlassian.com/repository/public" }
     maven { url "http://dl.bintray.com/epam/reportportal" }
+    maven { url "https://m2proxy.atlassian.com/repository/public" }
 
     if (!releaseMode) {
         maven { url 'https://jitpack.io' }
@@ -87,5 +87,5 @@ test {
 build.dependsOn jacocoTestReport
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.5.1'
 }

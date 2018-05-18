@@ -20,12 +20,21 @@
  */ 
 package com.epam.reportportal.extension.bugtracking.jira;
 
-import com.epam.ta.reportportal.database.dao.ProjectRepository;
+import static com.epam.ta.reportportal.commons.Predicates.notNull;
+import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
+import static com.epam.ta.reportportal.commons.validation.BusinessRule.fail;
+import static com.epam.ta.reportportal.ws.model.ErrorType.INCORRECT_REQUEST;
+import static com.epam.ta.reportportal.ws.model.ErrorType.PROJECT_NOT_FOUND;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+import com.epam.reportportal.extension.adapter.ProjectRepositoryAdapter;
 import com.epam.ta.reportportal.database.entity.AuthType;
 import com.epam.ta.reportportal.database.entity.ExternalSystem;
 import com.epam.ta.reportportal.database.entity.Project;
 import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.externalsystem.UpdateExternalSystemRQ;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,16 +42,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static com.epam.ta.reportportal.commons.Predicates.notNull;
-import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
-import static com.epam.ta.reportportal.commons.validation.BusinessRule.fail;
-import static com.epam.ta.reportportal.ws.model.ErrorType.INCORRECT_REQUEST;
-import static com.epam.ta.reportportal.ws.model.ErrorType.PROJECT_NOT_FOUND;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Created by andrei_varabyeu on 6/14/16.
@@ -56,7 +55,7 @@ public class JiraOAuthController {
 //	private JiraOAuthSecurityProvider pairProvider;
 
 	@Autowired
-	private ProjectRepository projectRepository;
+	private ProjectRepositoryAdapter projectRepositoryAdapter;
 
 	/**
 	 * Create {@link ExternalSystem} entry method via OAuth
@@ -74,7 +73,7 @@ public class JiraOAuthController {
 	public void externalSystemOAuthConnect(String projectName, UpdateExternalSystemRQ updateRQ, HttpServletRequest request,
 			HttpServletResponse response, String principalName) {
 
-		Project project = projectRepository.findByName(projectName);
+		Project project = projectRepositoryAdapter.findByName(projectName);
 		expect(project, notNull()).verify(PROJECT_NOT_FOUND, projectName);
 
 		if (AuthType.OAUTH.name().equalsIgnoreCase(updateRQ.getExternalSystemAuth())) {

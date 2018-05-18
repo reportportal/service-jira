@@ -21,10 +21,14 @@
 
 package com.epam.reportportal.extension.bugtracking.jira;
 
+import com.epam.reportportal.extension.adapter.LogRepositoryAdapter;
+import com.epam.reportportal.extension.adapter.TestItemRepositoryAdapter;
+import com.epam.ta.reportportal.database.entity.Log;
+import com.epam.ta.reportportal.database.entity.item.TestItem;
+import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
@@ -33,12 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.epam.ta.reportportal.database.dao.LogRepository;
-import com.epam.ta.reportportal.database.dao.TestItemRepository;
-import com.epam.ta.reportportal.database.entity.Log;
-import com.epam.ta.reportportal.database.entity.item.TestItem;
-import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 
 /**
  * Provide functionality for building jira's ticket description
@@ -59,10 +57,10 @@ public class JIRATicketDescriptionService {
 	private static final String IMAGE_HEIGHT_TEMPLATE = "|height=366!";
 
 	@Autowired
-	private LogRepository logRepository;
+	private LogRepositoryAdapter logRepositoryAdapter;
 
 	@Autowired
-	private TestItemRepository itemRepository;
+	private TestItemRepositoryAdapter testItemRepositoryAdapter;
 
 	private final DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
@@ -81,7 +79,7 @@ public class JIRATicketDescriptionService {
 		MimeTypes mimeRepository = tikaConfig.getMimeRepository();
 		StringBuilder descriptionBuilder = new StringBuilder();
 		for (String itemId : itemIds) {
-			List<Log> logs = logRepository.findByTestItemRef(itemId, ticketRQ.getNumberOfLogs(), ticketRQ.getIsIncludeScreenshots());
+			List<Log> logs = logRepositoryAdapter.findByTestItemRef(itemId, ticketRQ.getNumberOfLogs(), ticketRQ.getIsIncludeScreenshots());
 			if (null != ticketRQ.getBackLinks().get(itemId) && !ticketRQ.getBackLinks().get(itemId).isEmpty()) {
 				descriptionBuilder.append(BACK_LINK_HEADER);
 				descriptionBuilder.append("\n");
@@ -93,7 +91,7 @@ public class JIRATicketDescriptionService {
 			// TODO add multiple test-items backlinks
 			if (ticketRQ.getIsIncludeComments() && (ticketRQ.getBackLinks().size() == 1)) {
 				if (null != ticketRQ.getBackLinks().get(itemId) && !ticketRQ.getBackLinks().get(itemId).isEmpty()) {
-					TestItem item = itemRepository.findOne(ticketRQ.getTestItemId());
+					TestItem item = testItemRepositoryAdapter.findOne(ticketRQ.getTestItemId());
 					// If test-item contains any comments, then add it for JIRA
 					// comments section
 					if ((null != item.getIssue().getIssueDescription()) && (!item.getIssue().getIssueDescription().isEmpty())) {

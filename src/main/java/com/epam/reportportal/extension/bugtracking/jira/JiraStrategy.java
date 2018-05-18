@@ -21,6 +21,16 @@
 
 package com.epam.reportportal.extension.bugtracking.jira;
 
+import static com.epam.ta.reportportal.commons.Predicates.equalTo;
+import static com.epam.ta.reportportal.commons.Predicates.in;
+import static com.epam.ta.reportportal.commons.Predicates.isNull;
+import static com.epam.ta.reportportal.commons.Predicates.not;
+import static com.epam.ta.reportportal.commons.Predicates.notNull;
+import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
+import static com.epam.ta.reportportal.commons.validation.Suppliers.formattedSupplier;
+import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM;
+import static java.util.stream.Collectors.toSet;
+
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptions;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptionsBuilder;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
@@ -43,12 +53,12 @@ import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import com.epam.reportportal.extension.adapter.DataStorageAdapter;
 import com.epam.reportportal.extension.bugtracking.ExternalSystemStrategy;
 import com.epam.ta.reportportal.commons.Preconditions;
 import com.epam.ta.reportportal.commons.validation.BusinessRule;
 import com.epam.ta.reportportal.config.CacheConfiguration;
 import com.epam.ta.reportportal.database.BinaryData;
-import com.epam.ta.reportportal.database.DataStorage;
 import com.epam.ta.reportportal.database.entity.AuthType;
 import com.epam.ta.reportportal.database.entity.ExternalSystem;
 import com.epam.ta.reportportal.exception.ReportPortalException;
@@ -57,12 +67,6 @@ import com.epam.ta.reportportal.ws.model.externalsystem.AllowedValue;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostFormField;
 import com.epam.ta.reportportal.ws.model.externalsystem.PostTicketRQ;
 import com.epam.ta.reportportal.ws.model.externalsystem.Ticket;
-import org.jasypt.util.text.BasicTextEncryptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,16 +80,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import static com.epam.ta.reportportal.commons.Predicates.equalTo;
-import static com.epam.ta.reportportal.commons.Predicates.in;
-import static com.epam.ta.reportportal.commons.Predicates.isNull;
-import static com.epam.ta.reportportal.commons.Predicates.not;
-import static com.epam.ta.reportportal.commons.Predicates.notNull;
-import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
-import static com.epam.ta.reportportal.commons.validation.Suppliers.formattedSupplier;
-import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM;
-import static java.util.stream.Collectors.toSet;
+import org.jasypt.util.text.BasicTextEncryptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 
 /**
  * JIRA related implementation of {@link ExternalSystemStrategy}.
@@ -101,7 +100,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraStrategy.class);
 
     @Autowired
-    private DataStorage dataStorage;
+    private DataStorageAdapter dataStorageAdapter;
 
     @Autowired
     private JIRATicketDescriptionService descriptionService;
@@ -200,7 +199,7 @@ public class JiraStrategy implements ExternalSystemStrategy {
             AttachmentInput[] attachmentInputs = new AttachmentInput[binaryData.size()];
             int counter = 0;
             for (Map.Entry<String, String> binaryDataEntry : binaryData.entrySet()) {
-                BinaryData data = dataStorage.fetchData(binaryDataEntry.getKey());
+                BinaryData data = dataStorageAdapter.fetchData(binaryDataEntry.getKey());
                 if (null != data) {
                     attachmentInputs[counter] = new AttachmentInput(binaryDataEntry.getValue(), data.getInputStream());
                     counter++;

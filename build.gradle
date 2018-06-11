@@ -66,6 +66,8 @@ dependencies {
     compile('com.atlassian.jira:jira-rest-java-client-core:4.0.0')
     compile('com.atlassian.fugue:fugue:2.6.1')
 
+    compile("org.springframework.boot:spring-boot-starter-amqp")
+
     compile 'net.oauth.core:oauth:20090617'
     compile 'net.oauth.core:oauth-httpclient4:20090913'
 

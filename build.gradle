@@ -23,8 +23,8 @@ apply plugin: "org.springframework.boot"
 apply plugin: 'jacoco'
 apply from: 'build-quality.gradle'
 apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-docker.gradle'
-//apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
-//apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-service.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-service.gradle'
 
 dependencyManagement {
     imports {
@@ -87,7 +87,7 @@ test {
 build.dependsOn jacocoTestReport
 
 jar {
-  archiveName = "service-jira.jar"
+  archiveName = "${baseName}.${extension}"
 }
 
 task resolveDependencies {

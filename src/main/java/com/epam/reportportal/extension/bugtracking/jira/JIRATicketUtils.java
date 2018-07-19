@@ -149,11 +149,14 @@ public class JIRATicketUtils {
 			if (null != cimFieldInfo.getAllowedValues()) {
 				try {
 					List<ComplexIssueInputFieldValue> arrayOfValues = Lists.newArrayList();
-					for (Object object : cimFieldInfo.getAllowedValues()) {
-						if (object instanceof CustomFieldOption) {
-							CustomFieldOption cfo = (CustomFieldOption) object;
-							arrayOfValues.add(ComplexIssueInputFieldValue.with("id", String.valueOf(cfo.getId())));
-						}
+					//					for (Object object : cimFieldInfo.getAllowedValues()) {
+					//						if (object instanceof CustomFieldOption) {
+					//							CustomFieldOption cfo = (CustomFieldOption) object;
+					//							arrayOfValues.add(ComplexIssueInputFieldValue.with("id", String.valueOf(cfo.getId())));
+					//						}
+					//					}
+					for (String value : one.getValue()) {
+						arrayOfValues.add(ComplexIssueInputFieldValue.with("id", value));
 					}
 					if (one.getFieldType().equalsIgnoreCase(IssueFieldType.ARRAY.name)) {
 						issueInputBuilder.setFieldValue(one.getId(), arrayOfValues);
@@ -225,7 +228,8 @@ public class JIRATicketUtils {
 		ARRAY("array"), 
 		DATE("date"), 
 		NUMBER("number"), 
-		USER("user"), 
+		USER("user"),
+		OPTION("option"),
 		STRING("string");
 		//@formatter:on
 

@@ -21,6 +21,8 @@
 
 package com.epam.reportportal.extension.bugtracking.jira;
 
+import java.util.Objects;
+
 /**
  * IssueSeverity enumerator<br>
  * Describe default severities from JIRA (a while)
@@ -39,10 +41,6 @@ public enum IssuePriority {
 
 	private long priority;
 
-	public long getValue() {
-		return priority;
-	}
-
 	IssuePriority(long value) {
 		this.priority = value;
 	}
@@ -58,7 +56,7 @@ public enum IssuePriority {
 
 	public static IssuePriority findByPriority(String priority) {
 		for (IssuePriority issuePriority : IssuePriority.values()) {
-			if (issuePriority.getValue() == Long.valueOf(priority)) {
+			if (Objects.equals(issuePriority.getValue(), Long.valueOf(priority))) {
 				return issuePriority;
 			}
 		}
@@ -67,5 +65,9 @@ public enum IssuePriority {
 
 	public static boolean isPresent(String name) {
 		return null != findByName(name);
+	}
+
+	public long getValue() {
+		return priority;
 	}
 }

@@ -1,20 +1,20 @@
 /*
  * Copyright 2016 EPAM Systems
- * 
- * 
+ *
+ *
  * This file is part of EPAM Report Portal.
  * https://github.com/reportportal/service-jira
- * 
+ *
  * Report Portal is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Report Portal is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Report Portal.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -93,10 +93,9 @@ public class JIRATicketUtils {
 		for (PostFormField one : fields) {
 			CimFieldInfo cimFieldInfo = cimIssueType.getFields().get(one.getId());
 			if (one.getIsRequired() && one.getValue().isEmpty()) {
-				BusinessRule.fail()
-						.withError(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
-								Suppliers.formattedSupplier("Required parameter '{}' is empty", one.getFieldName())
-						);
+				BusinessRule.fail().withError(ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM,
+						Suppliers.formattedSupplier("Required parameter '{}' is empty", one.getFieldName())
+				);
 			}
 
 			if (!checkField(one)) {
@@ -149,14 +148,13 @@ public class JIRATicketUtils {
 			if (null != cimFieldInfo.getAllowedValues()) {
 				try {
 					List<ComplexIssueInputFieldValue> arrayOfValues = Lists.newArrayList();
-					//					for (Object object : cimFieldInfo.getAllowedValues()) {
-					//						if (object instanceof CustomFieldOption) {
-					//							CustomFieldOption cfo = (CustomFieldOption) object;
-					//							arrayOfValues.add(ComplexIssueInputFieldValue.with("id", String.valueOf(cfo.getId())));
-					//						}
-					//					}
-					for (String value : one.getValue()) {
-						arrayOfValues.add(ComplexIssueInputFieldValue.with("id", value));
+					for (Object o : cimFieldInfo.getAllowedValues()) {
+						if (o instanceof CustomFieldOption) {
+							CustomFieldOption cfo = (CustomFieldOption) o;
+							if (one.getValue().contains(cfo.getValue())) {
+								arrayOfValues.add(ComplexIssueInputFieldValue.with("id", String.valueOf(cfo.getId())));
+							}
+						}
 					}
 					if (one.getFieldType().equalsIgnoreCase(IssueFieldType.ARRAY.name)) {
 						issueInputBuilder.setFieldValue(one.getId(), arrayOfValues);

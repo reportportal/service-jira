@@ -117,10 +117,8 @@ public class JIRATicketUtils {
 				continue;
 			}
 			if (one.getId().equalsIgnoreCase(IssueFieldId.PRIORITY_FIELD.id)) {
-				IssuePriority issuePriority = IssuePriority.findByPriority(one.getValue().get(0));
-				if (null != issuePriority) {
-					issueInputBuilder.setPriorityId(issuePriority.getValue());
-				}
+				if (null != IssuePriority.findByName(one.getValue().get(0)))
+					issueInputBuilder.setPriorityId(IssuePriority.findByName(one.getValue().get(0)).getValue());
 				continue;
 			}
 			if (one.getId().equalsIgnoreCase(IssueFieldId.COMPONENTS_FIELD.id)) {

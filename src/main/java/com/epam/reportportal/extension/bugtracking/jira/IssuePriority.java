@@ -17,14 +17,16 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with Report Portal.  If not, see <http://www.gnu.org/licenses/>.
- */ 
- 
+ */
+
 package com.epam.reportportal.extension.bugtracking.jira;
+
+import java.util.Objects;
 
 /**
  * IssueSeverity enumerator<br>
  * Describe default severities from JIRA (a while)
- * 
+ *
  * @author Andrei_Ramanchuk
  */
 public enum IssuePriority {
@@ -39,10 +41,6 @@ public enum IssuePriority {
 
 	private long priority;
 
-	public long getValue() {
-		return priority;
-	}
-
 	IssuePriority(long value) {
 		this.priority = value;
 	}
@@ -56,7 +54,20 @@ public enum IssuePriority {
 		return null;
 	}
 
+	public static IssuePriority findByPriority(String priority) {
+		for (IssuePriority issuePriority : IssuePriority.values()) {
+			if (Objects.equals(issuePriority.getValue(), Long.valueOf(priority))) {
+				return issuePriority;
+			}
+		}
+		return null;
+	}
+
 	public static boolean isPresent(String name) {
 		return null != findByName(name);
+	}
+
+	public long getValue() {
+		return priority;
 	}
 }

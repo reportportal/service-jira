@@ -24,21 +24,7 @@ package com.epam.reportportal.extension.bugtracking.jira;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptions;
 import com.atlassian.jira.rest.client.api.GetCreateIssueMetadataOptionsBuilder;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.api.domain.BasicComponent;
-import com.atlassian.jira.rest.client.api.domain.BasicIssue;
-import com.atlassian.jira.rest.client.api.domain.BasicPriority;
-import com.atlassian.jira.rest.client.api.domain.BasicProjectRole;
-import com.atlassian.jira.rest.client.api.domain.CimFieldInfo;
-import com.atlassian.jira.rest.client.api.domain.CimIssueType;
-import com.atlassian.jira.rest.client.api.domain.CimProject;
-import com.atlassian.jira.rest.client.api.domain.EntityHelper;
-import com.atlassian.jira.rest.client.api.domain.Issue;
-import com.atlassian.jira.rest.client.api.domain.IssueFieldId;
-import com.atlassian.jira.rest.client.api.domain.IssueType;
-import com.atlassian.jira.rest.client.api.domain.Project;
-import com.atlassian.jira.rest.client.api.domain.ProjectRole;
-import com.atlassian.jira.rest.client.api.domain.SearchResult;
-import com.atlassian.jira.rest.client.api.domain.Version;
+import com.atlassian.jira.rest.client.api.domain.*;
 import com.atlassian.jira.rest.client.api.domain.input.AttachmentInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
@@ -64,24 +50,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.epam.ta.reportportal.commons.Predicates.equalTo;
-import static com.epam.ta.reportportal.commons.Predicates.in;
-import static com.epam.ta.reportportal.commons.Predicates.isNull;
-import static com.epam.ta.reportportal.commons.Predicates.not;
-import static com.epam.ta.reportportal.commons.Predicates.notNull;
+import static com.epam.ta.reportportal.commons.Predicates.*;
 import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
 import static com.epam.ta.reportportal.commons.validation.Suppliers.formattedSupplier;
 import static com.epam.ta.reportportal.ws.model.ErrorType.UNABLE_INTERACT_WITH_EXTRERNAL_SYSTEM;
@@ -287,7 +262,18 @@ public class JiraStrategy implements ExternalSystemStrategy {
                 String fieldID = issueField.getId();
                 String fieldType = issueField.getSchema().getType();
                 List<AllowedValue> allowed = new ArrayList<>();
-                // Field NAME for user friendly UI output (for UI only)
+
+                // Provide values for custom fields with predefined options
+				if (issueField.getAllowedValues() != null) {
+					for (Object o : issueField.getAllowedValues()) {
+						if (o instanceof CustomFieldOption) {
+							CustomFieldOption customField = (CustomFieldOption) o;
+							allowed.add(new AllowedValue(String.valueOf(customField.getId()), (customField).getValue()));
+						}
+					}
+				}
+
+				// Field NAME for user friendly UI output (for UI only)
                 String fieldName = issueField.getName();
 
                 if (fieldID.equalsIgnoreCase(IssueFieldId.COMPONENTS_FIELD.id)) {

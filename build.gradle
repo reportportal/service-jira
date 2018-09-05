@@ -22,9 +22,9 @@ apply plugin: 'java'
 apply plugin: "org.springframework.boot"
 apply plugin: 'jacoco'
 apply from: 'build-quality.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-docker.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-info.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-service.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/4.0/build-docker.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/4.0/build-info.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/4.0/release-service.gradle'
 
 dependencyManagement {
     imports {
